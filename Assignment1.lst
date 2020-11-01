@@ -1,0 +1,139 @@
+SQL> select * from cat;
+
+TABLE_NAME                     TABLE_TYPE
+------------------------------ -----------
+COSTUMERS                      TABLE
+RENTALS                        TABLE
+VEHICLES                       TABLE
+
+
+SQL> DESC vehicles
+
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ID                                        NOT NULL NUMBER(38)
+ VIN                                       NOT NULL NUMBER(38)
+ LIC_NO                                    NOT NULL CHAR(10)
+ MAKE                                               CHAR(2)
+ MODEL                                              CHAR(10)
+ YEAR                                               NUMBER(38)
+ COLOR                                              CHAR(8)
+ COST                                               NUMBER(6,2)
+
+
+SQL> DESC costumers
+
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ C_ID                                      NOT NULL NUMBER(38)
+ NAME                                      NOT NULL CHAR(10)
+ PHONE                                              CHAR(9)
+ EMAIL                                              CHAR(15)
+
+
+SQL>DESC rentals
+
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ C_ID                                      NOT NULL NUMBER(38)
+ V_ID                                      NOT NULL NUMBER(38)
+ CK_OUT_DATE                               NOT NULL DATE
+ MILES_OUT                                          NUMBER(38)
+ RET_DATE                                           DATE
+ MILES_IN                                           NUMBER(38)
+
+
+SQL> select a.owner, a.table_name, column_name primary_key,
+  2              a.constraint_name
+  3        from   user_cons_columns a, user_constraints b
+  4        where  a.constraint_name = b.constraint_name and
+  5               constraint_type = 'P';
+
+OWNER        TABLE_NAME   PRIMARY_KEY  CONSTRAINT_NAME
+------------ ------------ ------------ ------------------------------
+DBCLASS53    RENTALS      V_ID         SYS_C0025664
+DBCLASS53    RENTALS      C_ID         SYS_C0025664
+DBCLASS53    COSTUMERS    C_ID         SYS_C0025661
+DBCLASS53    VEHICLES     ID           SYS_C0025657
+
+SQL> select a.owner, a.table_name, a.column_name foreign_key,
+  2               b.table_name Referring_table, b.column_name
+  3               Primary_key
+  4        from   user_cons_columns a, user_cons_columns b,
+  5               user_constraints c
+  6        where  a.constraint_name = c.constraint_name and
+  7               c.r_constraint_name = b.constraint_name;
+
+OWNER        TABLE_NAME   FOREIGN_KEY  REFERRING_TABLE PRIMARY_KEY
+------------ ------------ ------------ --------------- ------------
+DBCLASS53    RENTALS      C_ID         COSTUMERS       C_ID
+DBCLASS53    RENTALS      V_ID         VEHICLES        ID
+
+SQL> select owner, table_name, search_condition from
+  2          user_constraints where search_condition is not null;
+
+
+OWNER        TABLE_NAME   SEARCH_CONDITION
+------------ ------------ ---------------------------------------------
+DBCLASS53    RENTALS      "CK_OUT_DATE" IS NOT NULL
+DBCLASS53    VEHICLES     "VIN" IS NOT NULL
+DBCLASS53    VEHICLES     "LIC_NO" IS NOT NULL
+DBCLASS53    VEHICLES     make in('F ', 'D ', 'H ', 'T ')
+DBCLASS53    VEHICLES     year >= 2015 and year <=2020
+DBCLASS53    COSTUMERS    "NAME" IS NOT NULL
+
+6 rows selected.
+
+SQL> SELECT * FROM vehicles;
+
+        ID        VIN LIC_NO     MA MODEL            YEAR COLOR          COST
+---------- ---------- ---------- -- ---------- ---------- -------- ----------
+      9123     170989 AAA 313    F  Focus            2017 Red           89.99
+      8723     920183 KJH 321    D  Durango          2019 Orange        99.99
+      8129     912371 OKJ 913    F  Mustang          2020 Black        149.99
+      6719     541515 KJY 713    T  Corolla          2018 Red           79.99
+      8172     982317 KYW 010    H  Civic            2017 Black         79.99
+      9801     670113 OKD 426    H  HR-V             2015 Black        119.99
+      9812     743658 KOE 998    F  Ranger           2016 White        109.99
+      3184     984714 MBC 134    T  Yaris            2016 Grey          84.99
+      3468     198313 PWS 134    T  C-HR             2020 White        114.99
+      4781     478296 DKT 934    D  Charger          2017 Grey          69.99
+
+10 rows selected.
+
+SQL> SELECT * FROM costumers;
+
+      C_ID NAME       PHONE     EMAIL
+---------- ---------- --------- ---------------
+     92390 John       984-3654  john@gmail.com
+     83751 Trent      364-6478  trent@yahoo.com
+     12973 Sam        321-4785  sam@hotmail.com
+     32153 Steve      364-7896  steve@gmail.com
+     78912 Tom        317-9645  tom@hotmail.com
+     36496 Nick       361-7964  nick@gmail.com
+     37964 Roni       348-6415  roni@uark.edu
+     93479 Carrie     946-1257  carrie@uark.edu
+     97365 Beth       364-9563  beth@gmail.com
+     47962 Ed         974-3654  ed@hotmail.com
+     97513 Beth       147-6325  beth@yahoo.com
+
+11 rows selected.
+
+SQL> SELECT * FROM rentals;
+
+      C_ID       V_ID CK_OUT_DA  MILES_OUT RET_DATE    MILES_IN
+---------- ---------- --------- ---------- --------- ----------
+     47962       3468 19-MAY-19      62453 25-MAY-19      64125
+     78912       8172 15-JAN-20      36541 24-JAN-20      41315
+     12973       6719 11-MAR-20       2021 14-MAR-20       2500
+     97365       9123 18-APR-20      36245 25-APR-20      40163
+     78912       3184 25-DEC-19      78512 30-DEC-19      80713
+     32153       6719 05-JAN-20       9845 09-JAN-20      11630
+     12973       9812 20-FEB-20      65134 25-FEB-20      66142
+     47962       6719 04-AUG-19      64893 12-AUG-19      67145
+     32153       8129 16-FEB-20      79613 25-FEB-20      82341
+     83751       9801 04-JUL-20      79125 14-JUL-20      81452
+
+10 rows selected.
+
+SQL> spool off
